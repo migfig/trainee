@@ -47,7 +47,7 @@
     <div class="status-bar">
       Created by
       <a
-        href="https://migfig.github.com"
+        href="https://github.com/migfig/trainee"
         style="margin-left: 4px; margin-right: 4px;"
         >migfig</a
       >
