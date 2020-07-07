@@ -41,7 +41,7 @@
     <div id="sidebar" class="side-bar" v-if="sideBarActive">
       <SideBar />
     </div>
-    <div class="content">
+    <div class="main-content">
       <slot></slot>
     </div>
     <div class="status-bar">
@@ -86,6 +86,13 @@ export default class Layout extends Vue {
   grid-template-rows: auto 1fr auto;
 }
 
+@media (max-width: 700px) {
+  .main-content,
+  .side-bar {
+    grid-column: 1 / span 3;
+  }
+}
+
 .app-bar {
   grid-area: 1/1/1/3;
   align-self: stretch;
@@ -97,7 +104,7 @@ export default class Layout extends Vue {
   background: --bg-color;
 }
 
-.content {
+.main-content {
   grid-area: 2/2/2/2;
   border-left: 1px solid #ccc;
 }
@@ -107,6 +114,7 @@ export default class Layout extends Vue {
   color: #fff;
   background: #343a40;
   display: flex;
+  align-items: center;
   justify-content: center;
 }
 </style>

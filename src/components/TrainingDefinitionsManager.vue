@@ -115,105 +115,107 @@
         v-html="compiledDescriptionMarkdown"
         v-if="!isEditMode"
       ></div>
+      <div class="actions-section">
+        <b-navbar
+          toggleable="sm"
+          type="dark"
+          variant="primary"
+          style="opacity: 0.95;"
+        >
+          <b-navbar-brand href="#">
+            <b-icon icon="filter"></b-icon>&nbsp;
+            <small>Test</small>
+          </b-navbar-brand>
+
+          <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+
+          <b-collapse id="nav-collapse" is-nav>
+            <b-navbar-nav>
+              <b-form-select
+                v-model="$store.state.selectedTestId"
+                :options="selectedDefinition.sourceTests"
+                id="testDefinition"
+                value-field="id"
+                text-field="text"
+                size="sm"
+                class="mt-1"
+                style="min-width: 345px;"
+              ></b-form-select>
+              <!-- left toolbar actions -->
+              <b-button-toolbar class="ml-2">
+                <b-button-group>
+                  <b-button
+                    title="Edit test"
+                    @click="setIsEditingTest(!$store.state.isEditingTest)"
+                    :disabled="$store.state.isEditingTest"
+                  >
+                    <b-icon icon="pencil" aria-hidden="true"></b-icon>
+                  </b-button>
+                  <b-button title="Clone test" class="ml-1" @click="cloneTest">
+                    <b-icon icon="files" aria-hidden="true"></b-icon>
+                  </b-button>
+                  <b-button
+                    title="Remove test"
+                    class="ml-1"
+                    :disabled="!canRemoveTests"
+                    @click="removeTest"
+                  >
+                    <b-icon icon="trash" aria-hidden="true"></b-icon>
+                  </b-button>
+                </b-button-group>
+              </b-button-toolbar>
+            </b-navbar-nav>
+
+            <!-- right toolbar actions -->
+            <b-navbar-nav class="ml-auto">
+              <b-button-toolbar>
+                <b-button-group>
+                  <b-button title="New test" class="ml-1" @click="addTest">
+                    <b-icon icon="plus-circle" aria-hidden="true"></b-icon>
+                  </b-button>
+                </b-button-group>
+              </b-button-toolbar>
+            </b-navbar-nav>
+          </b-collapse>
+        </b-navbar>
+        <ul v-if="!$store.state.isEditingTest">
+          <li
+            class="item"
+            v-for="(test, index) in compiledTestsMarkdown"
+            :key="index"
+          >
+            <div v-html="test" class="succeeded-failed"></div>
+          </li>
+        </ul>
+        <TestDefinitionForm v-if="$store.state.isEditingTest" />
+      </div>
     </div>
-    <div class="actions-section">
-      <b-navbar
-        toggleable="sm"
-        type="dark"
-        variant="primary"
-        style="opacity: 0.95;"
-      >
-        <b-navbar-brand href="#">
-          <b-icon icon="filter"></b-icon>&nbsp;
-          <small>Test</small>
-        </b-navbar-brand>
-
-        <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-
-        <b-collapse id="nav-collapse" is-nav>
-          <b-navbar-nav>
-            <b-form-select
-              v-model="$store.state.selectedTestId"
-              :options="selectedDefinition.sourceTests"
-              id="testDefinition"
-              value-field="id"
-              text-field="text"
-              size="sm"
-              class="mt-1"
-              style="min-width: 345px;"
-            ></b-form-select>
-            <!-- left toolbar actions -->
-            <b-button-toolbar class="ml-2">
-              <b-button-group>
-                <b-button
-                  title="Edit test"
-                  @click="setIsEditingTest(!$store.state.isEditingTest)"
-                  :disabled="$store.state.isEditingTest"
-                >
-                  <b-icon icon="pencil" aria-hidden="true"></b-icon>
-                </b-button>
-                <b-button title="Clone test" class="ml-1" @click="cloneTest">
-                  <b-icon icon="files" aria-hidden="true"></b-icon>
-                </b-button>
-                <b-button
-                  title="Remove test"
-                  class="ml-1"
-                  :disabled="!canRemoveTests"
-                  @click="removeTest"
-                >
-                  <b-icon icon="trash" aria-hidden="true"></b-icon>
-                </b-button>
-              </b-button-group>
-            </b-button-toolbar>
-          </b-navbar-nav>
-
-          <!-- right toolbar actions -->
-          <b-navbar-nav class="ml-auto">
-            <b-button-toolbar>
-              <b-button-group>
-                <b-button title="New test" class="ml-1" @click="addTest">
-                  <b-icon icon="plus-circle" aria-hidden="true"></b-icon>
-                </b-button>
-              </b-button-group>
-            </b-button-toolbar>
-          </b-navbar-nav>
-        </b-collapse>
-      </b-navbar>
-      <ul v-if="!$store.state.isEditingTest">
-        <li
-          class="item"
-          v-for="(test, index) in compiledTestsMarkdown"
-          :key="index"
-        >
-          <div v-html="test" class="succeeded-failed"></div>
-        </li>
-      </ul>
-      <TestDefinitionForm v-if="$store.state.isEditingTest" />
-    </div>
-    <MonacoEditor
-      class="editor-section"
-      v-model="selectedDefinition.htmlSource"
-      :options="$data.htmlOptions"
-    />
-    <div class="test-results-section">
-      <ul>
-        <li
-          class="failed-item"
-          v-for="(test, index) in compiledFailedTestsMarkdown"
-          :key="index"
-        >
-          <div v-html="test" class="succeeded-failed"></div>
-        </li>
-      </ul>
-      <ul>
-        <li
-          class="succeeded-item"
-          v-for="(test, index) in compiledSucceededTestsMarkdown"
-          :key="index"
-        >
-          <div v-html="test" class="succeeded-failed"></div>
-        </li>
-      </ul>
+    <div class="editor-section">
+      <MonacoEditor
+        class="editor"
+        v-model="selectedDefinition.htmlSource"
+        :options="$data.htmlOptions"
+      />
+      <div class="test-results-section">
+        <ul>
+          <li
+            class="failed-item"
+            v-for="(test, index) in compiledFailedTestsMarkdown"
+            :key="index"
+          >
+            <div v-html="test" class="succeeded-failed"></div>
+          </li>
+        </ul>
+        <ul>
+          <li
+            class="succeeded-item"
+            v-for="(test, index) in compiledSucceededTestsMarkdown"
+            :key="index"
+          >
+            <div v-html="test" class="succeeded-failed"></div>
+          </li>
+        </ul>
+      </div>
     </div>
     <div class="view-section" v-html="selectedDefinition.htmlSource"></div>
   </div>
@@ -349,6 +351,14 @@ export default class TrainingDefinitionsManager extends Vue {
   grid-template-rows: 56px 1fr 180px;
 }
 
+@media (max-width: 700px) {
+  .description-section,
+  .editor-section,
+  .view-section {
+    grid-column: 1 / span 4;
+  }
+}
+
 .toolbar-section {
   grid-area: 1/1/1/4;
   align-self: stretch;
@@ -363,7 +373,7 @@ export default class TrainingDefinitionsManager extends Vue {
   grid-area: 2/1/2/1;
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 0.4fr 1fr;
+  grid-template-rows: 0.5fr 1fr 0.5fr;
   background: --bg-color;
 }
 
@@ -391,6 +401,10 @@ export default class TrainingDefinitionsManager extends Vue {
 .editor-section {
   grid-area: 2/2/3/2;
   border-left: 1px solid #ccc;
+  width: 33vw;
+}
+
+.editor {
   width: 33vw;
   height: calc(65vh - 3px);
 }
